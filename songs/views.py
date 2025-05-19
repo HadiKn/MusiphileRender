@@ -20,7 +20,7 @@ class PublicSongListView(generics.ListAPIView):
     serializer_class = MiniSongSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'artist_name', 'album_title']
+    search_fields = ['title', 'artist__username', 'album__title']
 
 class SongRetrieveView(generics.RetrieveAPIView):
     queryset = Song.objects.all()

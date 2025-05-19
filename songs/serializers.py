@@ -21,6 +21,12 @@ class SongSerializer(serializers.ModelSerializer):
             'release_date', 'genre'
         ]
         read_only_fields = ['artist']
+    
+    def validate_album_id(self,album):
+        user = self.context['request'].user
+        if album.artist != user:
+            raise serializers.ValidationError(f"You cannot add your song to '{album.title}' because it does not belong to you.")
+        return album
 
     def get_album(self, obj):
         from albums.serializers import MiniAlbumSerializer 

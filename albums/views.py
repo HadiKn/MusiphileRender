@@ -22,7 +22,7 @@ class PublicAlbumListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MiniAlbumSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'artist_name']
+    search_fields = ['title', 'artist__username']
 
 
 class AlbumListCreateView(generics.ListCreateAPIView):

@@ -15,7 +15,8 @@ class AlbumSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Song.objects.all(),
         write_only=True,
-        source='songs'
+        source='songs',
+        required=False
     )
 
     class Meta:
