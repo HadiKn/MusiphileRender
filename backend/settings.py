@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'songs',
     'albums',
     'playlists',
+    'follows',
 ]
 
 MIDDLEWARE = [

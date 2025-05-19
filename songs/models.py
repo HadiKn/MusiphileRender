@@ -12,7 +12,7 @@ class Song(models.Model):
     duration = models.DurationField(blank=True,null=True)  # The duration of the song
     audio_file = models.FileField(upload_to='songs/', blank=True, null=True)  # Link to the song's audio file
     cover_art = models.ImageField(upload_to='song_covers/', blank=True, null=True)
-    release_date = models.DateField(default=timezone.now().date())
+    release_date = models.DateField(auto_now_add=True)
     genre = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

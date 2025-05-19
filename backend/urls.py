@@ -8,6 +8,8 @@ urlpatterns = [
     path('api/songs/', include('songs.urls')),
     path('api/albums/', include('albums.urls')),
     path('api/playlists/', include('playlists.urls')),
+    path('api/follows/', include('follows.urls')),
+
 ]
 
 

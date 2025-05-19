@@ -4,6 +4,7 @@ from albums.models import Album
 
 class SongSerializer(serializers.ModelSerializer):
     audio_file = serializers.FileField(required=False)
+    audio_url = serializers.SerializerMethodField()  
     artist = serializers.SerializerMethodField()
     album = serializers.SerializerMethodField()
     album_id = serializers.PrimaryKeyRelatedField(
@@ -17,10 +18,18 @@ class SongSerializer(serializers.ModelSerializer):
         model = Song
         fields = [
             'id', 'title', 'artist', 'album', 'album_id',
-            'duration', 'audio_file', 'cover_art',
+            'duration', 'audio_file', 'audio_url', 'cover_art', 
             'release_date', 'genre'
         ]
         read_only_fields = ['artist']
+    
+    def get_audio_url(self, obj):
+        if obj.audio_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.audio_file.url)
+            return obj.audio_file.url
+        return None
     
     def validate_album_id(self,album):
         user = self.context['request'].user
@@ -57,8 +66,6 @@ class SongSerializer(serializers.ModelSerializer):
             old_album.delete()
 
         return response
-
-
 
 class MiniSongSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.username')
