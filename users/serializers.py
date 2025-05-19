@@ -21,4 +21,4 @@ class UserSerializer(serializers.ModelSerializer):
 class MiniUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'profile_picture')
+        fields = ('id', 'username', 'profile_picture','is_artist')

@@ -11,23 +11,41 @@ class FollowCreateView(generics.CreateAPIView):
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
     
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         artist_id = self.kwargs.get('artist_id')
         try:
             artist = User.objects.get(id=artist_id)
+            
+            # Check if the target user is an artist
+            if not artist.is_artist:
+                return Response(
+                    {"error": "You can only follow users who are artists"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # Check if user is trying to follow themselves
+            if self.request.user == artist:
+                return Response(
+                    {"error": "You cannot follow yourself"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            # Check if already following
+            if Follow.objects.filter(follower=self.request.user, artist=artist).exists():
+                return Response(
+                    {"error": "You are already following this artist"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            follow = Follow.objects.create(follower=self.request.user, artist=artist)
+            serializer = self.get_serializer(follow)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
         except User.DoesNotExist:
-            raise ValidationError("Artist not found")
-            
-        # Check if the target user is an artist
-        if not artist.is_artist:
-            raise ValidationError("You can only follow users who are artists")
-            
-        # Check if user is trying to follow themselves
-        if self.request.user == artist:
-            raise ValidationError("You cannot follow yourself")
-            
-        # The unique_together constraint will handle duplicate follows
-        serializer.save(follower=self.request.user, artist=artist)
+            return Response(
+                {"error": "Artist not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class UnfollowView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -40,7 +58,15 @@ class UnfollowView(generics.DestroyAPIView):
                 artist_id=artist_id
             )
         except Follow.DoesNotExist:
-            raise ValidationError("You are not following this artist")
+            raise ValidationError({"error": "You are not following this artist"})
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response({"message": "Successfully unfollowed"}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
 class UserFollowingListView(generics.ListAPIView):
     serializer_class = FollowingSerializer
