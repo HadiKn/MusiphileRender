@@ -3,11 +3,12 @@ from .models import Playlist
 from users.serializers import MiniUserSerializer
 from songs.serializers import MiniSongSerializer
 from songs.models import Song
-
+from rest_framework.reverse import reverse
 
 class PlaylistSerializer(serializers.ModelSerializer):
-    owner = MiniUserSerializer(read_only=True)
-    songs = MiniSongSerializer(many=True, read_only=True)
+    owner = serializers.SerializerMethodField()
+    songs = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
     song_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Song.objects.all(),
@@ -15,25 +16,50 @@ class PlaylistSerializer(serializers.ModelSerializer):
         source='songs'  # Directly modifies the ManyToMany field
     )
 
+    class Meta:
+        model = Playlist
+        fields = [
+            'id', 'name', 'owner', 'songs', 'song_ids', 
+            'detail_url', 'created_at', 'cover_art'
+        ]
+    
+    def get_owner(self, obj):
+        return MiniUserSerializer(obj.owner, context=self.context).data
+    
+    def get_songs(self, obj):
+        return MiniSongSerializer(obj.songs.all(), many=True, context=self.context).data
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(reverse('playlist-retrieve', kwargs={'pk': obj.pk}))
+        return None
+
     def create(self, validated_data):
         songs = validated_data.pop('songs', [])
-        playlist = Playlist.objects.create(**validated_data)
+        playlist = Playlist.objects.create(owner=self.context['request'].user, **validated_data)
         playlist.songs.set(songs)
         return playlist
 
     def update(self, instance, validated_data):
-        songs = validated_data.pop('songs', None)
+        # Remove songs from validated_data if present to prevent song modifications
+        if 'songs' in validated_data:
+            validated_data.pop('songs')
+        
+        # Update other fields only (name, cover_art, etc.)
         instance = super().update(instance, validated_data)
-        if songs:
-            instance.songs.add(*songs)  # This appends rather than replaces
         return instance
-
-    class Meta:
-        model = Playlist
-        fields = ['id', 'name', 'owner','songs','song_ids', 'created_at','cover_art']
 
 class MiniPlaylistSerializer(serializers.ModelSerializer):
     owner_name = serializers.ReadOnlyField(source='owner.username')
+    detail_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Playlist
-        fields = ['id', 'name','owner_name','cover_art']
+        fields = ['id', 'name', 'owner_name', 'cover_art', 'detail_url']
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(reverse('playlist-retrieve', kwargs={'pk': obj.pk}))
+        return None

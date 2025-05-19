@@ -4,13 +4,14 @@ from django.contrib.auth import get_user_model
 from users.serializers import MiniUserSerializer
 from songs.serializers import MiniSongSerializer
 from songs.models import Song
+from rest_framework.reverse import reverse
 
 User = get_user_model()
 
-
 class AlbumSerializer(serializers.ModelSerializer):
     artist = MiniUserSerializer(read_only=True)
-    songs = MiniSongSerializer(many=True,read_only=True)
+    songs = MiniSongSerializer(many=True, read_only=True)
+    detail_url = serializers.SerializerMethodField()
     song_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Song.objects.all(),
@@ -21,8 +22,17 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ['id', 'title', 'artist', 'songs', 'song_ids', 'release_date', 'cover_art']
+        fields = [
+            'id', 'title', 'artist', 'songs', 'song_ids', 
+            'detail_url', 'release_date', 'cover_art'
+        ]
         read_only_fields = ['artist']
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(reverse('album-retrieve', kwargs={'pk': obj.pk}))
+        return None
 
     def validate_song_ids(self, songs):
         user = self.context['request'].user
@@ -41,7 +51,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         songs = validated_data.pop('songs', None)
         instance = super().update(instance, validated_data)
         
-        if songs:
+        if songs is not None:
             # Store old albums before updating song relationships
             old_albums = {}
             for song in songs:
@@ -57,12 +67,19 @@ class AlbumSerializer(serializers.ModelSerializer):
             for album_id, album in old_albums.items():
                 if album.songs.count() == 0:
                     album.delete()
-                    
+        
         return instance
-
 
 class MiniAlbumSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.username')
+    detail_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Album
-        fields = ['id', 'title','artist_name','cover_art']
+        fields = ['id', 'title', 'artist_name', 'cover_art', 'detail_url']
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(reverse('album-retrieve', kwargs={'pk': obj.pk}))
+        return None

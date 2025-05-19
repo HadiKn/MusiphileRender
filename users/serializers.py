@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework.reverse import reverse
 
 User = get_user_model()
 
@@ -19,6 +20,16 @@ class UserSerializer(serializers.ModelSerializer):
     
 
 class MiniUserSerializer(serializers.ModelSerializer):
+    detail_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ('id', 'username', 'profile_picture','is_artist')
+        fields = ('id', 'username', 'profile_picture', 'is_artist', 'detail_url')
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(
+                reverse('artist-profile', kwargs={'pk': obj.pk})
+            )
+        return None

@@ -33,7 +33,7 @@ class AlbumListCreateView(generics.ListCreateAPIView):
 
 class AlbumUpdateDeleteView(generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = AlbumSerializer
-    ermission_classes = [permissions.IsAuthenticated,IsArtist]
+    permission_classes = [permissions.IsAuthenticated,IsArtist]
     def get_queryset(self):
         return Album.objects.filter(artist=self.request.user)
 
