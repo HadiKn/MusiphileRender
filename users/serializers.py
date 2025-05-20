@@ -6,10 +6,27 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    detail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'profile_picture', 'is_artist')
+        fields = ('id', 'username', 'email', 'password', 'profile_picture', 'is_artist', 'detail_url')
+
+    
+    
+    def get_detail_url(self, obj):
+        request = self.context.get('request')
+        if request:
+            # Check if the user is an artist and return the appropriate URL
+            if obj.is_artist:
+                return request.build_absolute_uri(
+                    reverse('artist-profile', kwargs={'pk': obj.pk})
+                )
+            else:
+                return request.build_absolute_uri(
+                    reverse('user-profile', kwargs={'pk': obj.pk})
+                )
+        return None
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -29,7 +46,13 @@ class MiniUserSerializer(serializers.ModelSerializer):
     def get_detail_url(self, obj):
         request = self.context.get('request')
         if request:
-            return request.build_absolute_uri(
-                reverse('artist-profile', kwargs={'pk': obj.pk})
-            )
+            # Check if the user is an artist and return the appropriate URL
+            if obj.is_artist:
+                return request.build_absolute_uri(
+                    reverse('artist-profile', kwargs={'pk': obj.pk})
+                )
+            else:
+                return request.build_absolute_uri(
+                    reverse('user-profile', kwargs={'pk': obj.pk})
+                )
         return None

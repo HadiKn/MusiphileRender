@@ -1,12 +1,14 @@
 from django.urls import path
-from .views import UserSignupView, UserDetailUpdateView, UserDeactivateView,UserLoginView,UserLogoutView,ArtistSearchView,PublicArtistDetailView
+from .views import UserSignupView, UserRetrieveUpdateView, UserDeactivateView,UserLoginView,UserLogoutView,ArtistListView,ArtistRetrieveView,UserListView,UserRetrieveView
 
 urlpatterns = [
-    path('signup/', UserSignupView.as_view(), name='user-signup'), 
-    path('list/', ArtistSearchView.as_view(), name='artist-list'),
+    path('create/', UserSignupView.as_view(), name='user-signup'), 
     path('login/', UserLoginView.as_view(), name='user-login'),
     path('logout/', UserLogoutView.as_view(), name='user-logout'),
-    path('modify/<int:pk>/', UserDetailUpdateView.as_view(), name='user-profile'),
-    path('retrieve/<int:pk>/', PublicArtistDetailView.as_view(), name='artist-profile'),
-    path('deactivate/<int:pk>/', UserDeactivateView.as_view(), name='user-deactivate'),
+    path('list/artist/', ArtistListView.as_view(), name='artist-list'),
+    path('list/user/', UserListView.as_view(), name='user-list'),
+    path('retrieve/artist/<int:pk>/', ArtistRetrieveView.as_view(), name='artist-profile'),
+    path('retrieve/user/<int:pk>/', UserRetrieveView.as_view(), name='user-profile'),
+    path('modify/', UserRetrieveUpdateView.as_view(), name='user-profile-current'),
+    path('deactivate/', UserDeactivateView.as_view(), name='user-deactivate'),
 ]

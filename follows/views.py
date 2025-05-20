@@ -73,8 +73,14 @@ class UserFollowingListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        # Only show the current user's follows
-        return Follow.objects.filter(follower=self.request.user)
+        # Get the user_id from URL parameters, or use the current user if not provided
+        user_id = self.kwargs.get('user_id')
+        if user_id:
+            # Show follows for the specified user
+            return Follow.objects.filter(follower_id=user_id)
+        else:
+            # Show follows for the current authenticated user
+            return Follow.objects.filter(follower=self.request.user)
 
 class ArtistFollowersListView(generics.ListAPIView):
     serializer_class = FollowerSerializer
@@ -82,4 +88,7 @@ class ArtistFollowersListView(generics.ListAPIView):
     
     def get_queryset(self):
         artist_id = self.kwargs.get('artist_id')
-        return Follow.objects.filter(artist_id=artist_id)
+        if artist_id :
+            return Follow.objects.filter(artist_id=artist_id)
+        else:
+            return Follow.objects.filter(artist=self.request.user)
