@@ -9,6 +9,6 @@ urlpatterns = [
     path('list/user/', UserListView.as_view(), name='user-list'),
     path('retrieve/artist/<int:pk>/', ArtistRetrieveView.as_view(), name='artist-profile'),
     path('retrieve/user/<int:pk>/', UserRetrieveView.as_view(), name='user-profile'),
-    path('modify/', UserRetrieveUpdateView.as_view(), name='user-profile-current'),
+    path('modify/', UserRetrieveUpdateView.as_view(), name='my-profile'),
     path('deactivate/', UserDeactivateView.as_view(), name='user-deactivate'),
 ]

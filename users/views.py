@@ -42,13 +42,11 @@ class UserRetrieveView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
 
-# private retrieve or update user account
+# retrieve or update my account
 class UserRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    
     def get_object(self):
-        # Return the current authenticated user
         return self.request.user
 
 # create account 
@@ -61,8 +59,6 @@ class UserSignupView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token, _ = Token.objects.get_or_create(user=user)
-        
-        # Pass the request in the context when serializing the user for response
         user_data = UserSerializer(user, context={'request': request}).data
         
         return api_response(
@@ -77,11 +73,10 @@ class UserLoginView(APIView):
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
-
         user = authenticate(username=username, password=password)
         if user is not None:
             token, _ = Token.objects.get_or_create(user=user)
-            user_data = UserSerializer(user).data
+            user_data = UserSerializer(user, context={'request': request}).data
             return api_response(
                 data={"user": user_data, "token": token.key},
                 message="Login successful",

@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 class SongSerializer(serializers.ModelSerializer):
     audio_file = serializers.FileField(required=False)
-    audio_url = serializers.SerializerMethodField()  
+    audio_url = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     album = serializers.SerializerMethodField()
     detail_url = serializers.SerializerMethodField()
