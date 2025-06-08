@@ -19,7 +19,7 @@ class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         fields = [
-            'id', 'title', 'artist', 'album', 'album_id', 'detail_url',
+            'id', 'title','play_count','artist', 'album', 'album_id', 'detail_url',
             'duration', 'audio_file', 'audio_url', 'cover_art', 
             'release_date', 'genre'
         ]
@@ -104,7 +104,7 @@ class MiniSongSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Song
-        fields = ['id', 'title', 'artist_name', 'album_title', 'cover_art', 'detail_url']
+        fields = ['id', 'title','play_count', 'artist_name', 'album_title', 'cover_art', 'detail_url']
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None

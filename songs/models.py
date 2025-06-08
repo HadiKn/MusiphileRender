@@ -14,6 +14,7 @@ class Song(models.Model):
     cover_art = models.ImageField(upload_to='song_covers/', blank=True, null=True)
     release_date = models.DateField(auto_now_add=True)
     genre = models.CharField(max_length=100, blank=True, null=True)
+    play_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title

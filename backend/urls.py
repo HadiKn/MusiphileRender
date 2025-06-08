@@ -9,11 +9,10 @@ urlpatterns = [
     path('api/albums/', include('albums.urls')),
     path('api/playlists/', include('playlists.urls')),
     path('api/follows/', include('follows.urls')),
+    path('api/streams/', include('streams.urls')),
 
 ]
 
 
 if settings.DEBUG : 
     urlpatterns += static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)
-
-
