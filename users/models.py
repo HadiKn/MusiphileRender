@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
+from cloudinary.models import CloudinaryField
 
 class User(AbstractUser):
     username = models.CharField(
@@ -13,7 +14,12 @@ class User(AbstractUser):
 )]
     )
     email = models.EmailField(unique=True)
-    profile_picture = models.ImageField(upload_to='users/', blank=True, null=True)
+    profile_picture = CloudinaryField(
+        'profile_pictures/',
+        folder='users/profile_pictures/',
+        null=True,
+        blank=True
+    )
     is_artist = models.BooleanField(default=False)
 
     def __str__(self):

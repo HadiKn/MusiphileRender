@@ -15,13 +15,20 @@ class PlaylistSerializer(serializers.ModelSerializer):
         write_only=True,
         source='songs'  # Directly modifies the ManyToMany field
     )
+    cover_art_url = serializers.SerializerMethodField() 
 
     class Meta:
         model = Playlist
         fields = [
             'id', 'name', 'owner', 'songs', 'song_ids', 
-            'detail_url', 'created_at', 'cover_art'
+            'detail_url', 'created_at', 'cover_art','cover_art_url'
         ]
+        read_only_fields = ['cover_art_url']
+    
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
+        return None
     
     def get_owner(self, obj):
         return MiniUserSerializer(obj.owner, context=self.context).data
@@ -53,10 +60,16 @@ class PlaylistSerializer(serializers.ModelSerializer):
 class MiniPlaylistSerializer(serializers.ModelSerializer):
     owner_name = serializers.ReadOnlyField(source='owner.username')
     detail_url = serializers.SerializerMethodField()
-    
+    cover_art_url = serializers.SerializerMethodField()    
     class Meta:
         model = Playlist
-        fields = ['id', 'name', 'owner_name', 'cover_art', 'detail_url']
+        fields = ['id', 'name', 'owner_name', 'cover_art', 'detail_url','cover_art_url']
+        read_only_fields = ['cover_art_url']
+        
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
+        return None
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None

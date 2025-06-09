@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Song
 from albums.models import Album
 from rest_framework.reverse import reverse
+from cloudinary import CloudinaryResource  # Add this import
 
 class SongSerializer(serializers.ModelSerializer):
     audio_file = serializers.FileField(required=False)
@@ -15,23 +16,33 @@ class SongSerializer(serializers.ModelSerializer):
         source='album', 
         required=False
     )
+    cover_art_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Song
         fields = [
-            'id', 'title','play_count','artist', 'album', 'album_id', 'detail_url',
-            'duration', 'audio_file', 'audio_url', 'cover_art', 
-            'release_date', 'genre'
+            'id', 'title', 'play_count', 'artist', 'album', 'album_id', 
+            'detail_url', 'duration', 'audio_file', 'audio_url', 'cover_art',
+            'release_date', 'genre','cover_art_url'
         ]
-        read_only_fields = ['artist']
-    
+        read_only_fields = ['play_count', 'artist', 'audio_url','cover_art_url']
+
     def get_audio_url(self, obj):
         if obj.audio_file:
+            # If using Cloudinary, return the secure URL
+            if hasattr(obj.audio_file, 'url'):
+                return obj.audio_file.url
+            # Fallback to local URL if not using Cloudinary
             request = self.context.get('request')
-            if request:
+            if request is not None:
                 return request.build_absolute_uri(obj.audio_file.url)
-            return obj.audio_file.url
         return None
+
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
+        return None
+    
     
     def get_detail_url(self, obj):
         request = self.context.get('request')
@@ -101,13 +112,19 @@ class MiniSongSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.username')
     album_title = serializers.ReadOnlyField(source='album.title')
     detail_url = serializers.SerializerMethodField()
+    cover_art_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Song
-        fields = ['id', 'title','play_count', 'artist_name', 'album_title', 'cover_art', 'detail_url']
+        fields = ['id', 'title','play_count', 'artist_name', 'album_title', 'cover_art', 'detail_url','cover_art_url']
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None
         if request:
             return request.build_absolute_uri(reverse('song-retrieve', kwargs={'pk': obj.pk}))
+        return None
+    
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
         return None

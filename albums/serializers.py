@@ -19,15 +19,22 @@ class AlbumSerializer(serializers.ModelSerializer):
         source='songs',
         required=False
     )
+    cover_art_url = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Album
         fields = [
             'id', 'title', 'artist', 'songs', 'song_ids', 
-            'detail_url', 'release_date', 'cover_art'
+            'detail_url', 'release_date', 'cover_art','cover_art_url'
         ]
-        read_only_fields = ['artist']
+        read_only_fields = ['artist','cover_art_url']
     
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
+        return None
+
     def get_detail_url(self, obj):
         request = self.context.get('request')
         if request:
@@ -73,13 +80,19 @@ class AlbumSerializer(serializers.ModelSerializer):
 class MiniAlbumSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.username')
     detail_url = serializers.SerializerMethodField()
+    cover_art_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Album
-        fields = ['id', 'title', 'artist_name', 'cover_art', 'detail_url']
+        fields = ['id', 'title', 'artist_name', 'cover_art', 'detail_url','cover_art_url']
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None
         if request:
             return request.build_absolute_uri(reverse('album-retrieve', kwargs={'pk': obj.pk}))
+        return None
+    
+    def get_cover_art_url(self, obj):
+        if obj.cover_art:
+            return obj.cover_art.url
         return None

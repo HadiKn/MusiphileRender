@@ -2,7 +2,7 @@ from django.db import models
 from albums.models import Album 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
+from cloudinary.models import CloudinaryField
 User = get_user_model()
 
 class Song(models.Model):
@@ -10,8 +10,18 @@ class Song(models.Model):
     artist = models.ForeignKey(User, related_name='songs', on_delete=models.CASCADE)  # Linked to User (Artist)
     album = models.ForeignKey(Album, related_name='songs', on_delete=models.CASCADE, blank=True, null=True)
     duration = models.DurationField(blank=True,null=True)  # The duration of the song
-    audio_file = models.FileField(upload_to='songs/', blank=True, null=True)  # Link to the song's audio file
-    cover_art = models.ImageField(upload_to='song_covers/', blank=True, null=True)
+    audio_file = CloudinaryField(
+        resource_type='video',  # This handles both audio and video files
+        folder='songs/audio/',  # Optional: organize files in Cloudinary
+        null=True,
+        blank=True
+    )
+    cover_art = CloudinaryField(
+        'image',
+        folder='songs/covers/',
+        null=True,
+        blank=True
+    )
     release_date = models.DateField(auto_now_add=True)
     genre = models.CharField(max_length=100, blank=True, null=True)
     play_count = models.PositiveIntegerField(default=0)
