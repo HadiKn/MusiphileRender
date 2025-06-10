@@ -132,13 +132,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -155,10 +148,19 @@ REST_FRAMEWORK = {
 }
 
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': config('CLOUDINARY_API_KEY'),
     'API_SECRET': config('CLOUDINARY_API_SECRET'),
+    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'staticfiles', 'manifest'),
+    'STATICFILES_STORAGE': 'cloudinary_storage.storage.StaticHashedCloudinaryStorage',
     'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 
                                'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'css', 'js'],
 }
@@ -171,5 +173,6 @@ cloudinary.config(
     secure=True
 )
 
+# Storage settings
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
