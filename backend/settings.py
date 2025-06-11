@@ -150,18 +150,17 @@ REST_FRAMEWORK = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'https://res.cloudinary.com/{}/static/'.format(config('CLOUDINARY_CLOUD_NAME'))
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
 # Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': config('CLOUDINARY_API_KEY'),
     'API_SECRET': config('CLOUDINARY_API_SECRET'),
     'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'staticfiles', 'manifest'),
-    'STATICFILES_STORAGE': 'cloudinary_storage.storage.StaticHashedCloudinaryStorage',
     'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 
                                'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg', 'css', 'js'],
 }
