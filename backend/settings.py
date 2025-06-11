@@ -158,7 +158,7 @@ STATICFILES_DIRS = [
 ] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
 
 STATICFILES_DIRS += [
-    os.path.join(os.path.dirname(rest_framework.file), 'static'),
+    os.path.join(os.path.dirname(rest_framework.__file__), 'static'),
 ]
 
 # Cloudinary configuration
