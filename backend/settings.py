@@ -15,6 +15,7 @@ import cloudinary.api
 from pathlib import Path
 from decouple import config
 import os
+import rest_framework
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -155,6 +156,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
+
+STATICFILES_DIRS += [
+    os.path.join(os.path.dirname(rest_framework.file), 'static'),
+]
+
 # Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
