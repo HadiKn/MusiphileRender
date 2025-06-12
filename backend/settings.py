@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'storages',
+    'drf_spectacular',
     'users',
     'songs',
     'albums',
@@ -167,7 +168,24 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
+
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Musiphile API',
+    'VERSION': '1.0.0',
+    'DESCRIPTION': 'API for Musiphile music streaming service and social network',
+    'SECURITY': [{'TokenAuth': []}],  # applies TokenAuth globally to all endpoints
+    'SECURITY_SCHEMES': {
+        'TokenAuth': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'Token authentication with "Token <token>"',
+        },
+    },
 }
 
 

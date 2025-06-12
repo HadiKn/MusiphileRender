@@ -49,6 +49,7 @@ class FollowCreateView(generics.CreateAPIView):
 
 class UnfollowView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = FollowSerializer
     
     def get_object(self):
         artist_id = self.kwargs.get('artist_id')
