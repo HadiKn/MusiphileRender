@@ -28,11 +28,20 @@ class SongRetrieveView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 # only for artists
-class ArtistSongListCreateView(generics.ListCreateAPIView):
-    serializer_class = SongSerializer
-    permission_classes = [permissions.IsAuthenticated,IsArtist]
+# For listing artist's songs (using MiniSongSerializer)
+class MySongsListView(generics.ListAPIView):
+    serializer_class = MiniSongSerializer
+    permission_classes = [permissions.IsAuthenticated, IsArtist]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'album__title']
     def get_queryset(self):
         return Song.objects.filter(artist=self.request.user)
+
+# For creating a new song (using SongSerializer)
+class SongCreateView(generics.CreateAPIView):
+    serializer_class = SongSerializer
+    permission_classes = [permissions.IsAuthenticated, IsArtist]
+    
     def perform_create(self, serializer):
         serializer.save(artist=self.request.user)
 

@@ -81,10 +81,12 @@ class MiniAlbumSerializer(serializers.ModelSerializer):
     artist_name = serializers.ReadOnlyField(source='artist.username')
     detail_url = serializers.SerializerMethodField()
     cover_art_url = serializers.SerializerMethodField()
+    songs_count = serializers.IntegerField(source='songs.count', read_only=True) 
+
     
     class Meta:
         model = Album
-        fields = ['id', 'title', 'artist_name', 'cover_art', 'detail_url','cover_art_url']
+        fields = ['id', 'title', 'artist_name', 'cover_art', 'detail_url','cover_art_url','songs_count']
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None

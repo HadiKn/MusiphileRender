@@ -61,9 +61,11 @@ class MiniPlaylistSerializer(serializers.ModelSerializer):
     owner_name = serializers.ReadOnlyField(source='owner.username')
     detail_url = serializers.SerializerMethodField()
     cover_art_url = serializers.SerializerMethodField()    
+    songs_count = serializers.IntegerField(source='songs.count', read_only=True)
+
     class Meta:
         model = Playlist
-        fields = ['id', 'name', 'owner_name', 'cover_art', 'detail_url','cover_art_url']
+        fields = ['id', 'name', 'owner_name', 'cover_art', 'detail_url','cover_art_url','songs_count']
         read_only_fields = ['cover_art_url']
         
     def get_cover_art_url(self, obj):
