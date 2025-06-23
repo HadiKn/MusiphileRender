@@ -1,4 +1,4 @@
-from rest_framework import generics, status, filters
+from rest_framework import generics, status, filters, parsers  
 from rest_framework.response import Response
 from .serializers import UserSerializer, MiniUserSerializer
 from django.contrib.auth import get_user_model
@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from .utils import api_response
+from drf_spectacular.utils import extend_schema
 
 User = get_user_model()
 
@@ -43,9 +44,39 @@ class UserRetrieveView(generics.RetrieveAPIView):
 
 
 # retrieve or update my account
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'username': {
+                    'type': 'string',
+                    'description': 'New username (must be unique)',
+                    'maxLength': 150
+                },
+                'profile_picture': {
+                    'type': 'string',
+                    'format': 'binary',
+                    'description': 'Profile picture image file (optional)'
+                },
+                'email': {
+                    'type': 'string',
+                    'format': 'email',
+                    'description': 'Email address (optional)'
+                },
+                'is_artist': {
+                    'type': 'boolean',
+                    'description': 'Whether the user is an artist (optional)'
+                }
+            }
+        }
+    }
+)
 class UserRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
+    
     def get_object(self):
         return self.request.user
 

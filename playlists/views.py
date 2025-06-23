@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import PlaylistSerializer, MiniPlaylistSerializer
 from songs.models import Song
-
+from drf_spectacular.utils import extend_schema
+from rest_framework import parsers
 
 class PlaylistListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -15,14 +16,34 @@ class PlaylistListView(generics.ListAPIView):
     def get_queryset(self):
         return Playlist.objects.filter(owner=self.request.user) 
 
+
+
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'name': {'type': 'string', 'description': 'Name of the playlist'},
+                'cover_art': {'type': 'string', 'format': 'binary', 'description': 'Optional cover art image'},
+                'song_ids': {
+                    'type': 'array',
+                    'items': {'type': 'integer'},
+                    'description': 'Optional list of song IDs to add to this playlist'
+                }
+            },
+            'required': ['name']
+        }
+    }
+)
+
 class PlaylistCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PlaylistSerializer
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']  
     def get_queryset(self):
         return Playlist.objects.filter(owner=self.request.user) 
-
 
 class PlaylistRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -34,7 +55,7 @@ class PlaylistRetrieveView(generics.RetrieveUpdateDestroyAPIView):
 class AddSongsToPlaylistView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PlaylistSerializer
-    
+
     def get_queryset(self):
         return Playlist.objects.filter(owner=self.request.user)
     

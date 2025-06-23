@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_detail_url(self, obj):
         request = self.context.get('request')
         if request:
-            # Check if the user is an artist and return the appropriate URL
+            # Check if the user is an artist to return detail url
             if obj.is_artist:
                 return request.build_absolute_uri(
                     reverse('artist-profile', kwargs={'pk': obj.pk})

@@ -2,10 +2,11 @@ from rest_framework import serializers
 from .models import Song
 from albums.models import Album
 from rest_framework.reverse import reverse
-from cloudinary import CloudinaryResource  # Add this import
+from cloudinary import CloudinaryResource
+import os
 
 class SongSerializer(serializers.ModelSerializer):
-    audio_file = serializers.FileField(required=False)
+    audio_file = serializers.FileField(required=False, validators=[])
     audio_url = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     album = serializers.SerializerMethodField()
@@ -14,7 +15,8 @@ class SongSerializer(serializers.ModelSerializer):
         queryset=Album.objects.all(),
         write_only=True,
         source='album', 
-        required=False
+        required=False,
+        allow_null=True
     )
     cover_art_url = serializers.SerializerMethodField()
 
@@ -23,16 +25,28 @@ class SongSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'play_count', 'artist', 'album', 'album_id', 
             'detail_url', 'duration', 'audio_file', 'audio_url', 'cover_art',
-            'release_date', 'genre','cover_art_url'
+            'release_date', 'genre', 'cover_art_url'
         ]
-        read_only_fields = ['play_count', 'artist', 'audio_url','cover_art_url']
+        read_only_fields = ['play_count', 'artist', 'audio_url', 'cover_art_url']
+
+    def validate_audio_file(self, value):
+        if value:
+            ext = os.path.splitext(value.name.lower())[1]
+            if ext not in Song.SUPPORTED_FORMATS:
+                raise serializers.ValidationError(
+                    f'Unsupported file format. Supported formats: { ", ".join(Song.SUPPORTED_FORMATS) }'
+                )
+            
+            max_size = 50 * 1024 * 1024  
+            if value.size > max_size:
+                raise serializers.ValidationError('File size too large. Maximum size is 50MB.')
+            
+        return value
 
     def get_audio_url(self, obj):
         if obj.audio_file:
-            # If using Cloudinary, return the secure URL
             if hasattr(obj.audio_file, 'url'):
                 return obj.audio_file.url
-            # Fallback to local URL if not using Cloudinary
             request = self.context.get('request')
             if request is not None:
                 return request.build_absolute_uri(obj.audio_file.url)
@@ -43,13 +57,12 @@ class SongSerializer(serializers.ModelSerializer):
             return obj.cover_art.url
         return None
     
-    
     def get_detail_url(self, obj):
         request = self.context.get('request')
         if request:
             return request.build_absolute_uri(reverse('song-retrieve', kwargs={'pk': obj.pk}))
         return None
-    
+
     def validate_album_id(self, album):
         user = self.context['request'].user
         if album.artist != user:

@@ -1,7 +1,8 @@
-from rest_framework import generics,permissions,filters
+from rest_framework import generics,permissions,filters,parsers
 from .models import Album
 from .serializers import AlbumSerializer,MiniAlbumSerializer
 from users.permissions import IsArtist
+from drf_spectacular.utils import extend_schema
 
 
 # list all Albums for a certain artist
@@ -35,9 +36,27 @@ class MyAlbumsListView(generics.ListAPIView):
         return Album.objects.filter(artist=self.request.user)
 
 # For creating a new album (using AlbumSerializer)
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'title': {'type': 'string', 'description': 'Title of the album'},
+                'cover_art': {'type': 'string', 'format': 'binary', 'description': 'Optional cover art image'},
+                'song_ids': {
+                    'type': 'array',
+                    'items': {'type': 'integer'},
+                    'description': 'Optional list of song IDs to add to this album'
+                }
+            },
+            'required': ['title']
+        }
+    }
+)
 class AlbumCreateView(generics.CreateAPIView):
     serializer_class = AlbumSerializer
     permission_classes = [permissions.IsAuthenticated, IsArtist]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     
 class AlbumUpdateDeleteView(generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = AlbumSerializer
