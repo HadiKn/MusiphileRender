@@ -13,13 +13,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'password', 'profile_picture', 'is_artist', 'detail_url','profile_picture_url')
         read_only_fields = ['profile_picture_url']
-
+    
     
     
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url
-        return None
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1750667815/users/profile_pictures/mqeaxicqow67y8hmprxd.webp"
     
     def get_detail_url(self, obj):
         request = self.context.get('request')
@@ -54,7 +54,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url
-        return None
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1750667815/users/profile_pictures/mqeaxicqow67y8hmprxd.webp"
     
     def get_detail_url(self, obj):
         request = self.context.get('request')
