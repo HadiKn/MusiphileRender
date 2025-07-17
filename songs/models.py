@@ -11,7 +11,6 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 class Song(models.Model):
-    # Supported audio formats
     SUPPORTED_FORMATS = [
         '.mp3',
         '.wav',
@@ -22,12 +21,12 @@ class Song(models.Model):
     ]
     
     title = models.CharField(max_length=200)
-    artist = models.ForeignKey(User, related_name='songs', on_delete=models.CASCADE)  # Linked to User (Artist)
+    artist = models.ForeignKey(User, related_name='songs', on_delete=models.CASCADE)  
     album = models.ForeignKey(Album, related_name='songs', on_delete=models.CASCADE, blank=True, null=True)
-    duration = models.DurationField(blank=True,null=True)  # The duration of the song
+    duration = models.DurationField(blank=True,null=True) 
     audio_file = CloudinaryField(
-        resource_type='video',  # This handles both audio and video files
-        folder='songs/audio/',  # Optional: organize files in Cloudinary
+        resource_type='video', 
+        folder='songs/audio/', 
         null=True,
         blank=True
     )
@@ -47,7 +46,6 @@ class Song(models.Model):
     def clean(self):
         super().clean()
         if self.audio_file:
-            # Get file extension
             _, ext = os.path.splitext(self.audio_file.name.lower())
             if ext not in self.SUPPORTED_FORMATS:
                 raise ValidationError(

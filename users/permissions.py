@@ -7,7 +7,6 @@ class IsArtist(BasePermission):
         return request.user and request.user.is_authenticated and request.user.is_artist
 
     def has_object_permission(self, request, view, obj):
-        # Check for both 'artist' and 'author' fields
         if hasattr(obj, 'artist') and obj.artist == request.user:
             return True
         if hasattr(obj, 'author') and obj.author == request.user:

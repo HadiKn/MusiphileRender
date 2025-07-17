@@ -56,7 +56,7 @@ class MyAlbumsListView(generics.ListAPIView):
 class AlbumCreateView(generics.CreateAPIView):
     serializer_class = AlbumSerializer
     permission_classes = [permissions.IsAuthenticated, IsArtist]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser,parsers.JSONParser]
     
 class AlbumUpdateDeleteView(generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = AlbumSerializer

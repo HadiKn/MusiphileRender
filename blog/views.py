@@ -31,6 +31,7 @@ class BlogPostCreateView(generics.CreateAPIView):
     serializer_class = BlogPostSerializer
     permission_classes = [permissions.IsAuthenticated,IsArtist]
 
+# list all my posts
 class MyBlogPostListView(generics.ListAPIView):
     serializer_class = MiniBlogPostSerializer
     permission_classes = [permissions.IsAuthenticated]

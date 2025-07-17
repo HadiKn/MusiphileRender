@@ -39,7 +39,7 @@ class PlaylistListView(generics.ListAPIView):
 class PlaylistCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PlaylistSerializer
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']  
     def get_queryset(self):
