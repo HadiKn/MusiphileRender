@@ -74,7 +74,6 @@ class UserFollowingListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        # Get the user_id from URL parameters, or use the current user if not provided
         user_id = self.kwargs.get('user_id')
         if user_id:
             # Show follows for the specified user

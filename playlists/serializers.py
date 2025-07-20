@@ -13,7 +13,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Song.objects.all(),
         write_only=True,
-        source='songs'  # Directly modifies the ManyToMany field
+        source='songs' 
     )
     cover_art_url = serializers.SerializerMethodField() 
 

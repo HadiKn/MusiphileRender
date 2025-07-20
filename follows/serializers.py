@@ -19,9 +19,7 @@ class FollowingSerializer(serializers.ModelSerializer):
         fields = ['id', 'artists']
     def get_artists(self, obj):
         from users.serializers import MiniUserSerializer
-        # Since obj is a Follow object, we need to get all artists followed by the same follower
         follower = obj.follower
-        # Find all artists this user follows
         artist_users = User.objects.filter(followers__follower=follower)
         return MiniUserSerializer(artist_users, many=True, context=self.context).data
 
@@ -35,8 +33,6 @@ class FollowerSerializer(serializers.ModelSerializer):
         
     def get_followers(self, obj):
         from users.serializers import MiniUserSerializer
-        # Since obj is a Follow object, we need to get all followers of the same artist
         artist = obj.artist
-        # Find all followers of this artist through the related_name
         follower_users = User.objects.filter(following__artist=artist)
         return MiniUserSerializer(follower_users, many=True, context=self.context).data
