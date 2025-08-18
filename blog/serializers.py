@@ -67,10 +67,19 @@ class BlogPostSerializer(serializers.ModelSerializer):
 class MiniBlogPostSerializer(serializers.ModelSerializer):
     author = MiniUserSerializer(read_only=True)
     comment_count = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
+
     
     class Meta:
         model = BlogPost
-        fields = ['id', 'author', 'title','content', 'created_at', 'comment_count']
-        read_only_fields = ['id', 'author', 'created_at', 'comment_count']    
+        fields = ['id', 'author', 'title','content', 'created_at', 'comment_count','detail_url']
+        read_only_fields = ['id', 'author', 'created_at', 'comment_count','detail_url']    
     def get_comment_count(self, obj):
         return obj.comments.count()
+    def get_detail_url(self, obj):
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(
+                reverse('blogpost-retrieve', kwargs={'pk': obj.pk})
+            )
+        return None

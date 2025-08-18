@@ -12,3 +12,5 @@ class IsArtist(BasePermission):
         if hasattr(obj, 'author') and obj.author == request.user:
             return True
         return False
+
+
