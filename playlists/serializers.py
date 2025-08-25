@@ -71,7 +71,8 @@ class MiniPlaylistSerializer(serializers.ModelSerializer):
     def get_cover_art_url(self, obj):
         if obj.cover_art:
             return obj.cover_art.url
-        return None
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1756144376/file_00000000cef461f5ae996a1c636b56e3_l3ksaa.png"
+
     
     def get_detail_url(self, obj):
         request = self.context.get('request') if hasattr(self, 'context') else None

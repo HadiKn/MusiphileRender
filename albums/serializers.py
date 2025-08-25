@@ -92,7 +92,8 @@ class MiniAlbumSerializer(serializers.ModelSerializer):
         request = self.context.get('request') if hasattr(self, 'context') else None
         if request:
             return request.build_absolute_uri(reverse('album-retrieve', kwargs={'pk': obj.pk}))
-        return None
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1756144236/file_00000000882461f981bc37afc2955813_y05i1l.png"
+
     
     def get_cover_art_url(self, obj):
         if obj.cover_art:
