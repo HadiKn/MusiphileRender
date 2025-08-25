@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url
-        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1750667815/users/profile_pictures/mqeaxicqow67y8hmprxd.webp"
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1756162862/IMG_20250826_020007_720_x1nhxj.jpg"
     
     def get_detail_url(self, obj):
         request = self.context.get('request')
@@ -54,7 +54,7 @@ class MiniUserSerializer(serializers.ModelSerializer):
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url
-        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1750667815/users/profile_pictures/mqeaxicqow67y8hmprxd.webp"
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1756162862/IMG_20250826_020007_720_x1nhxj.jpg"
     
     def get_detail_url(self, obj):
         request = self.context.get('request')
