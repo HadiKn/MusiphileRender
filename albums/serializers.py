@@ -33,7 +33,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     def get_cover_art_url(self, obj):
         if obj.cover_art:
             return obj.cover_art.url
-        return None
+        return "https://res.cloudinary.com/dswjejbhq/image/upload/v1756144236/file_00000000882461f981bc37afc2955813_y05i1l.png"
 
     def get_detail_url(self, obj):
         request = self.context.get('request')
