@@ -1,7 +1,7 @@
 from rest_framework import generics, status, filters
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.db.models import F
+from django.db.models import F, Max as models_Max
 from .models import Stream
 from .serializers import StreamSerializer, StreamHistorySerializer
 from songs.models import Song
@@ -45,9 +45,20 @@ class UserStreamHistoryView(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        Return the stream history for the currently authenticated user.
+        Return the stream history for the currently authenticated user,
+        with only the most recent stream for each song.
         """
-        return Stream.objects.filter(user=self.request.user).select_related('song', 'song__artist', 'song__album')
+        # Get the most recent stream for each song
+        latest_streams = Stream.objects.filter(
+            user=self.request.user
+        ).values('song').annotate(
+            latest_stream_id=models_Max('id')
+        ).values_list('latest_stream_id', flat=True)
+        
+        # Return the full stream objects with related data
+        return Stream.objects.filter(
+            id__in=latest_streams
+        ).select_related('song', 'song__artist', 'song__album')
     
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
