@@ -12,27 +12,23 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class FollowingSerializer(serializers.ModelSerializer):
-    artists = serializers.SerializerMethodField()
+    artist = serializers.SerializerMethodField()
     
     class Meta:
         model = Follow
-        fields = ['id', 'artists']
-    def get_artists(self, obj):
+        fields = ['id', 'artist']
+    
+    def get_artist(self, obj):
         from users.serializers import MiniUserSerializer
-        follower = obj.follower
-        artist_users = User.objects.filter(followers__follower=follower)
-        return MiniUserSerializer(artist_users, many=True, context=self.context).data
-
+        return MiniUserSerializer(obj.artist, context=self.context).data
 
 class FollowerSerializer(serializers.ModelSerializer):
-    followers = serializers.SerializerMethodField()
+    follower = serializers.SerializerMethodField()
     
     class Meta:
         model = Follow
-        fields = ['id', 'followers']
-        
-    def get_followers(self, obj):
+        fields = ['id', 'follower']
+    
+    def get_follower(self, obj):
         from users.serializers import MiniUserSerializer
-        artist = obj.artist
-        follower_users = User.objects.filter(following__artist=artist)
-        return MiniUserSerializer(follower_users, many=True, context=self.context).data
+        return MiniUserSerializer(obj.follower, context=self.context).data
