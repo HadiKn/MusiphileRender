@@ -18,6 +18,7 @@ class AlbumRetriveView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AlbumSerializer
 
+# for listing someones albums
 class PublicAlbumListView(generics.ListAPIView):
     queryset = Album.objects.all()
     permission_classes = [permissions.IsAuthenticated]
@@ -26,7 +27,7 @@ class PublicAlbumListView(generics.ListAPIView):
     search_fields = ['title', 'artist__username']
 
 
-# For listing albums (using MiniAlbumSerializer)
+# For listing my albums (using MiniAlbumSerializer)
 class MyAlbumsListView(generics.ListAPIView):
     serializer_class = MiniAlbumSerializer
     permission_classes = [permissions.IsAuthenticated, IsArtist]

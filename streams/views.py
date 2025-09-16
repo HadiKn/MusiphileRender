@@ -32,30 +32,20 @@ class StreamCreateView(generics.CreateAPIView):
         )
 
 class UserStreamHistoryView(generics.ListAPIView):
-    """
-    API endpoint that allows users to view their stream history.
-    Returns songs in the same format as the songs/list/ endpoint.
-    """
     serializer_class = StreamHistorySerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['-created_at']  # Default: newest first
+    ordering_fields = ['-created_at']  
     ordering = ['-created_at']
-    pagination_class = None  # This disables pagination
+    pagination_class = None  
 
     def get_queryset(self):
-        """
-        Return the stream history for the currently authenticated user,
-        with only the most recent stream for each song.
-        """
         # Get the most recent stream for each song
         latest_streams = Stream.objects.filter(
             user=self.request.user
         ).values('song').annotate(
             latest_stream_id=models_Max('id')
         ).values_list('latest_stream_id', flat=True)
-        
-        # Return the full stream objects with related data
         return Stream.objects.filter(
             id__in=latest_streams
         ).select_related('song', 'song__artist', 'song__album')

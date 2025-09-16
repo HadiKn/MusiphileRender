@@ -82,14 +82,13 @@ class SongSerializer(serializers.ModelSerializer):
         from users.serializers import MiniUserSerializer 
         return MiniUserSerializer(
             obj.artist,
-            context=self.context  # This passes the request context to the nested serializer
+            context=self.context  
         ).data
 
     def create(self, validated_data):
         album = validated_data.get('album')
         title = validated_data.get('title')
-        artist = self.context['request'].user  # Get artist from request
-
+        artist = self.context['request'].user  
         # Auto-create album if not provided
         if not album:
             album, _ = Album.objects.get_or_create(
