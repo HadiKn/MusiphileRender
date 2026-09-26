@@ -68,7 +68,7 @@ Media files are managed using Cloudinary.
 
 ## Project Structure
 
-`text
+```text
 backend/
 │
 ├── albums/                 # Album management
@@ -163,7 +163,7 @@ backend/
 ├── models.dot              # Database model definition
 ├── music_app_models.png    # Database relationship diagram
 └── db.sqlite3              # Local development database
-`
+```
 
 ## Project Purpose
 
